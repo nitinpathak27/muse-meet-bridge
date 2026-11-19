@@ -69,6 +69,11 @@ function renderState(s) {
 
   // Warnings & errors
   els.apiWarning.classList.toggle("hidden", Boolean(s.hasApiKey));
+  if (s.hasApiKey) {
+    els.apiKeyInput.placeholder = "✅ Gemini API Key saved & active (paste new key to replace)";
+  } else {
+    els.apiKeyInput.placeholder = "AIza... (paste key and click Save Settings)";
+  }
   if (s.lastError) {
     els.errorBanner.textContent = `⚠️ ${s.lastError}`;
     els.errorBanner.classList.remove("hidden");
