@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: muse-meet-bridge
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: GEMINI_TRANSCRIBE_MODEL
+        value: gemini-2.5-flash
+      - key: GEMINI_NOTES_MODEL
+        value: gemini-2.5-flash
+      - key: GEMINI_TTS_MODEL
+        value: gemini-2.5-flash-preview-tts
+      - key: GEMINI_VOICE
+        value: Kore
+      - key: WAKE_WORD
+        value: muse
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: BRIDGE_API_KEY
+        sync: false

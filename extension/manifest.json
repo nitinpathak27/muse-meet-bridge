@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Muse Meet Bridge (Google Meet Ears)",
+  "version": "1.1.0",
+  "description": "Streams Google Meet tab audio to your Muse Meet Bridge server so Muse.ai can hear, respond, and take notes.",
+  "permissions": [
+    "tabCapture",
+    "offscreen",
+    "activeTab",
+    "tabs",
+    "storage"
+  ],
+  "host_permissions": [
+    "http://localhost:3456/*",
+    "https://*.onrender.com/*",
+    "https://*/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Muse Meet Bridge"
+  }
+}

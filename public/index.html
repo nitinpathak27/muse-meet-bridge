@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Muse Meet Bridge — Live Ears &amp; Voice Console</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="dot" id="status-dot"></span>
+      <div>
+        <h1>Muse Meet Bridge</h1>
+        <p class="subtitle">Ears &amp; Voice Console for Muse.ai in Google Meet</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <span class="badge" id="status-badge" aria-live="polite">STATUS: IDLE</span>
+      <button id="demo-btn" class="btn btn-secondary" title="Populate sample meeting transcript, question, and notes">
+        🎬 Load Demo
+      </button>
+      <button id="local-mic-btn" class="btn btn-secondary" title="Test using your own microphone without Google Meet">
+        🎤 Test Local Mic
+      </button>
+      <button id="clear-btn" class="btn btn-danger-outline">Clear Session</button>
+    </div>
+  </header>
+
+  <div id="api-warning" class="banner warning hidden" role="alert">
+    ⚠️ Gemini API key not set yet. Paste it in <strong>.env</strong> or enter it in the <strong>Settings</strong> section below.
+  </div>
+  <div id="error-banner" class="banner error hidden" role="alert"></div>
+
+  <main class="grid">
+    <!-- Left Column: Incoming Question + Muse Reply + Settings -->
+    <section class="col">
+      <!-- Incoming Question for Muse -->
+      <div class="card highlight-card" aria-label="Latest Question Addressed to Muse">
+        <div class="card-header">
+          <h2>👂 Latest Question for Muse</h2>
+          <span class="pill" id="question-status">No pending question</span>
+        </div>
+        <div id="latest-question" class="question-box" aria-live="assertive">
+          Waiting for someone in Google Meet to say "Muse..."
+        </div>
+      </div>
+
+      <!-- Muse Speak Box -->
+      <div class="card" aria-label="Speak Into Google Meet">
+        <div class="card-header">
+          <h2>🗣️ Speak as Muse into Google Meet</h2>
+          <span class="hint">Muse: type response below &amp; click Speak</span>
+        </div>
+        <textarea
+          id="muse-reply-input"
+          aria-label="Muse Reply Input"
+          rows="4"
+          placeholder="Type what Muse should say aloud in Google Meet... (Ctrl+Enter to speak)"
+        ></textarea>
+        <div class="row-between">
+          <div class="output-picker">
+            <label for="audio-output-select">Output Audio To:</label>
+            <select id="audio-output-select" aria-label="Audio Output Device">
+              <option value="">Default Speakers</option>
+            </select>
+            <button id="refresh-devices-btn" class="btn-icon" title="Refresh audio devices">🔄</button>
+          </div>
+          <button id="speak-btn" class="btn btn-primary" aria-label="Speak in Google Meet">
+            🔊 Speak in Google Meet
+          </button>
+        </div>
+      </div>
+
+      <!-- Settings Card -->
+      <details class="card settings-card" open>
+        <summary class="card-header">
+          <h2>⚙️ Bridge Settings</h2>
+          <span class="hint">Voice, Wake Word, Auto-Reply &amp; Key</span>
+        </summary>
+        <div class="settings-grid">
+          <label>
+            Gemini API Key (saved in memory only)
+            <input type="password" id="api-key-input" placeholder="AIza... (optional if set in .env)" />
+          </label>
+          <label>
+            Wake Word
+            <input type="text" id="wake-word-input" value="muse" />
+          </label>
+          <label>
+            Muse Voice (Gemini TTS)
+            <select id="voice-select">
+              <option value="Kore">Kore (Clear, Professional)</option>
+              <option value="Puck">Puck (Friendly, Upbeat)</option>
+              <option value="Aoede">Aoede (Warm, Natural)</option>
+              <option value="Charon">Charon (Deep, Calm)</option>
+              <option value="Fenrir">Fenrir (Confident)</option>
+            </select>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="auto-reply-toggle" />
+            <span>Auto-Reply with Gemini when wake word is heard (skip waiting for Muse to type)</span>
+          </label>
+          <label class="full-width">
+            Meeting Context / Agenda (optional)
+            <input type="text" id="context-input" placeholder="e.g. Q4 Product Roadmap sync with engineering team" />
+          </label>
+        </div>
+        <div class="row-end">
+          <button id="save-settings-btn" class="btn btn-secondary">Save Settings</button>
+        </div>
+      </details>
+    </section>
+
+    <!-- Right Column: Live Transcript + Meeting Notes -->
+    <section class="col">
+      <!-- Live Transcript -->
+      <div class="card transcript-card" aria-label="Live Meeting Transcript">
+        <div class="card-header">
+          <h2>📝 Live Google Meet Transcript</h2>
+          <button id="copy-transcript-btn" class="btn btn-small">Copy Transcript</button>
+        </div>
+        <div id="live-transcript" class="transcript-list" aria-live="polite">
+          <p class="empty-msg">No speech captured yet. Start the Chrome Extension on your Google Meet tab or click "Test Local Mic".</p>
+        </div>
+      </div>
+
+      <!-- Meeting Notes -->
+      <div class="card notes-card" aria-label="Meeting Notes and Action Items">
+        <div class="card-header">
+          <h2>📋 Meeting Notes &amp; Action Items</h2>
+          <div class="btn-group">
+            <button id="generate-notes-btn" class="btn btn-primary btn-small">✨ Generate Notes</button>
+            <button id="copy-notes-btn" class="btn btn-small">Copy Notes</button>
+          </div>
+        </div>
+        <textarea
+          id="meeting-notes"
+          aria-label="Generated Meeting Notes"
+          rows="10"
+          readonly
+          placeholder="Click 'Generate Notes' during or after the meeting to create a structured summary, decisions, and action items for Muse..."
+        ></textarea>
+      </div>
+    </section>
+  </main>
+
+  <audio id="tts-player" hidden></audio>
+  <script src="app.js"></script>
+</body>
+</html>
