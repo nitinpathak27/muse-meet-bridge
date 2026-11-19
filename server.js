@@ -546,12 +546,31 @@ app.post("/api/clear", (_req, res) => {
 //  - Session header: Mcp-Session-Id (created on initialize, echoed on each call)
 //  - Auth: Authorization: Bearer <BRIDGE_API_KEY> or x-api-key header
 //  - Event-buffered get_meeting_updates(since_event_id) + 25s long-poll wait_for_question
+function stripQuotesAndBearer(val) {
+  let s = String(val || "").trim();
+  // Strip accidental surrounding quotes
+  s = s.replace(/^["']|["']$/g, "").trim();
+  // Strip one or more leading "Bearer " prefixes (case-insensitive)
+  while (/^bearer\s+/i.test(s)) {
+    s = s.replace(/^bearer\s+/i, "").trim();
+  }
+  return s.replace(/^["']|["']$/g, "").trim();
+}
+
 function checkMcpAuth(req) {
-  if (!BRIDGE_API_KEY) return true;
+  const expected = stripQuotesAndBearer(BRIDGE_API_KEY);
+  if (!expected) return true;
   const authHeader = req.headers.authorization || "";
   const apiKeyHeader = req.headers["x-api-key"] || "";
-  const bearer = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : "";
-  return bearer === BRIDGE_API_KEY || apiKeyHeader === BRIDGE_API_KEY;
+  const bearer = stripQuotesAndBearer(authHeader);
+  const xKey = stripQuotesAndBearer(apiKeyHeader);
+  const ok = bearer === expected || xKey === expected;
+  if (!ok) {
+    console.warn(
+      `[MCP 401] Auth mismatch (auth header present: ${Boolean(authHeader)}, len: ${bearer.length}, expected len: ${expected.length})`
+    );
+  }
+  return ok;
 }
 
 const MCP_TOOLS = [
