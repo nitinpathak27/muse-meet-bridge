@@ -267,6 +267,14 @@ async function speakInMeeting(text, speakerLabel = "Muse") {
 
 // --- Routes ---
 
+app.get("/health", (_req, res) => {
+  res.json({
+    ok: true,
+    status: state.status,
+    uptimeSeconds: Math.floor(process.uptime()),
+  });
+});
+
 app.get("/api/state", (_req, res) => {
   res.json({
     ...state,
